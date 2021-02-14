@@ -1,0 +1,50 @@
+version: '3.8'
+services:
+  service-api:
+    build:
+      context: ./
+      dockerfile: Dockerfile.dev
+    ports:
+     - "6969:6969"
+    volumes:
+     - .:/go/src
+    env_file:
+      - vars.env
+    environment:
+      - LOCAL_DATABASE=TRUE
+      - DB_DBNAME=service_db
+      - DB_HOST=db
+      - DB_USER=myservice
+      - DB_PASSWORD=example
+      - DB_PORT=5432
+    depends_on:
+      - db
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - serv_network
+  db:
+    image: "postgres:12"
+    container_name: "service_postgres12_db"
+    environment:
+      - POSTGRES_PASSWORD=example
+      - POSTGRES_DB=service_db
+      - POSTGRES_USER=myservice
+    ports:
+      - "5432:5432"
+    shm_size: 1gb
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - serv_network
+volumes:
+  db_data:
+networks:
+  serv_network:
+    external: true
