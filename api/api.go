@@ -18,5 +18,6 @@ func Init(e *echo.Echo, repo resource.Postgres, cfg config.Config) {
 	}
 
 	e.POST("/register", h.register)
-	//e.POST("/login", h.login)
+	e.POST("/login", h.login)
+	e.POST("/refresh", h.refresh)
 }

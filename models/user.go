@@ -29,6 +29,20 @@ type UserDb struct {
 	UpdatedAt           *time.Time `db:"updated_at"`
 }
 
+type LoginRequest struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type LoginResponse struct {
+	AccessToken  string `json:"accessToken"`
+	RefreshToken string `json:"refreshToken"`
+}
+
+type RefreshRequest struct {
+	RefreshToken    string `json:"refreshToken"`
+}
+
 func (ur UserRequest) Validate() *ServiceError {
 	fmt.Println("user: ")
 	fmt.Println(ur)
@@ -49,12 +63,12 @@ func (ur UserRequest) Validate() *ServiceError {
 
 func (ur UserRequest) ToDbStruct() (*UserDb, *ServiceError) {
 	udb := UserDb{
-		Username:            ur.Username,
-		Email:               ur.Email,
-		GivenName:           ur.GivenName,
-		FamilyName:          ur.FamilyName,
+		Username:   ur.Username,
+		Email:      ur.Email,
+		GivenName:  ur.GivenName,
+		FamilyName: ur.FamilyName,
 	}
-	
+
 	hash, err := crypto.HashPassword(ur.Password)
 	if err != nil {
 		se := NewServiceError(ServiceErrorInternalError, err.Error(), http.StatusInternalServerError, &err)

@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/labstack/echo/v4"
 	"github.com/merrickfox/go-scaffold/models"
+	"net/http"
 )
 
 func (h *handler) register(c echo.Context) error {
@@ -26,5 +27,5 @@ func (h *handler) register(c echo.Context) error {
 		return err.ToResponse(c)
 	}
 
-	return nil
+	return c.String(http.StatusCreated, "")
 }

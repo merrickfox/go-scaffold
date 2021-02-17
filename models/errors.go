@@ -51,3 +51,7 @@ func (se ServiceError) ToResponse(c echo.Context) error {
 	response := newErrorResponse(se.code, se.message)
 	return c.JSON(se.httpStatus, response)
 }
+
+func (se ServiceError) Error() string {
+	return se.message
+}

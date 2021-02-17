@@ -1,6 +1,7 @@
 package resource
 
 import (
+	"fmt"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/lib/pq"
 	"github.com/merrickfox/go-scaffold/models"
@@ -25,4 +26,39 @@ func (p Postgres) InsertUser(user *models.UserDb) *models.ServiceError {
 	}
 
 	return nil
+}
+
+func (p Postgres) FetchUserByEmail(email string) (*models.UserDb, *models.ServiceError) {
+	psql := sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
+	query := psql.Select().
+		Columns("*").
+		From("users").
+		Where(sq.Eq{"email": email})
+	var user models.UserDb
+	sql, args, _ := query.ToSql()
+	err := p.Db.Get(&user, sql, args...)
+	if err != nil {
+		fmt.Println(err)
+		return nil, models.NewServiceError(models.ServiceErrorUnauthorised, "Incorrect user or password", http.StatusUnauthorized, &err)
+	}
+
+	return &user, nil
+}
+
+func (p Postgres) FetchUserById(id string) (*models.UserDb, *models.ServiceError) {
+	fmt.Println(id)
+	psql := sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
+	query := psql.Select().
+		Columns("*").
+		From("users").
+		Where(sq.Eq{"id": id})
+	var user models.UserDb
+	sql, args, _ := query.ToSql()
+	err := p.Db.Get(&user, sql, args...)
+	if err != nil {
+		fmt.Println(err)
+		return nil, models.NewServiceError(models.ServiceErrorUnauthorised, "Incorrect user or password", http.StatusUnauthorized, &err)
+	}
+
+	return &user, nil
 }

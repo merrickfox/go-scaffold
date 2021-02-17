@@ -6,7 +6,8 @@ import (
 )
 
 type Config struct {
-	JwtSecret string `env:"JWT_SECRET"`
+	JwtAccessSecret string `env:"JWT_ACCESS_SECRET"`
+	JwtRefreshSecret string `env:"JWT_REFRESH_SECRET"`
 }
 
 func GetConfig() Config {
