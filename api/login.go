@@ -49,11 +49,6 @@ func (h *handler) refresh(c echo.Context) error {
 		err = models.NewServiceError(models.ServiceErrorInternalError, "internal error", http.StatusInternalServerError, nil)
 		return err.ToResponse(c)
 	}
-	//e := ptClaims.Valid()
-	//if e != nil {
-	//	err = models.NewServiceError(models.ServiceErrorUnauthorised, e.Error(), http.StatusUnauthorized, nil)
-	//	return err.ToResponse(c)
-	//}
 
 	user, err := h.resource.FetchUserById(ptClaims.Subject)
 	if err != nil {

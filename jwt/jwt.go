@@ -66,7 +66,7 @@ func GenerateJwtPair(user models.UserDb, accessSigningKey, refreshSigningKey str
 	}
 
 	urc := RefreshClaims{
-		ExpiresAt: time.Now().Add(time.Second * 2).Unix(),
+		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
 		Subject:   user.Id,
 	}
 	rt, err := GenerateJwt([]byte(refreshSigningKey), urc)
