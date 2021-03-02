@@ -26,8 +26,7 @@ type AccessClaims struct {
 func (rc RefreshClaims) Valid() error {
 	vErr := new(jwt.ValidationError)
 	now := time.Now().Unix()
-	fmt.Println("Expires at: ", rc.ExpiresAt)
-	fmt.Println("now: ", now)
+
 	if now > rc.ExpiresAt {
 		delta := time.Unix(now, 0).Sub(time.Unix(rc.ExpiresAt, 0))
 		vErr.Inner = fmt.Errorf("token is expired by %v", delta)
@@ -46,7 +45,20 @@ func (rc RefreshClaims) GetExpiresAt() int64 {
 }
 
 func (rc AccessClaims) Valid() error {
-	return nil
+	vErr := new(jwt.ValidationError)
+	now := time.Now().Unix()
+
+	if now > rc.ExpiresAt {
+		delta := time.Unix(now, 0).Sub(time.Unix(rc.ExpiresAt, 0))
+		vErr.Inner = fmt.Errorf("token is expired by %v", delta)
+		vErr.Errors |= jwt.ValidationErrorExpired
+	}
+
+	if vErr.Errors == 0 {
+		return nil
+	}
+
+	return vErr
 }
 
 func GenerateJwtPair(user models.UserDb, accessSigningKey, refreshSigningKey string) (*models.LoginResponse, *models.ServiceError) {

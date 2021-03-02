@@ -21,7 +21,7 @@ func (h *handler) login(c echo.Context) error {
 
 	if ok := crypto.CheckPasswordHash(lr.Password, user.HashedPassword); !ok {
 		err = models.NewServiceError(models.ServiceErrorUnauthorised, "Incorrect user or password", http.StatusUnauthorized, nil)
-		err.ToResponse(c)
+		return err.ToResponse(c)
 	}
 
 	resp, err := jwt.GenerateJwtPair(*user, h.config.JwtAccessSecret, h.config.JwtRefreshSecret)

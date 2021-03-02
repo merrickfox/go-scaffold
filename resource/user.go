@@ -13,9 +13,9 @@ func (p Postgres) InsertUser(user *models.UserDb) *models.ServiceError {
 	query := psql.Insert("users").
 		Columns("username", "email", "given_name", "family_name", "hashed_password").
 		Values(user.Username, user.Email, user.GivenName, user.FamilyName, user.HashedPassword).
-		Suffix("RETURNING \"id\"").
+		Suffix("RETURNING \"id\", \"email_confirmation_code\", \"email_is_confirmed\"").
 		RunWith(p.Db.DB)
-	err := query.QueryRow().Scan(&user.Id)
+	err := query.QueryRow().Scan(&user.Id, &user.EmailConfirmationCode, &user.EmailIsConfirmed)
 	if err, ok := err.(*pq.Error); ok {
 		if err.Code == "23505" {
 			return models.NewServiceError(models.ServiceErrorUnprocessable, "user already exists", http.StatusUnprocessableEntity, nil)
@@ -46,7 +46,6 @@ func (p Postgres) FetchUserByEmail(email string) (*models.UserDb, *models.Servic
 }
 
 func (p Postgres) FetchUserById(id string) (*models.UserDb, *models.ServiceError) {
-	fmt.Println(id)
 	psql := sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
 	query := psql.Select().
 		Columns("*").
@@ -61,4 +60,19 @@ func (p Postgres) FetchUserById(id string) (*models.UserDb, *models.ServiceError
 	}
 
 	return &user, nil
+}
+
+func (p Postgres) UpdatePassword(user *models.UserDb) *models.ServiceError {
+	psql := sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
+	_, err := psql.Update("users").
+		Set("hashed_password", user.HashedPassword).
+		Set("password_last_updated", user.PasswordLastUpdated).
+		Where(sq.Eq{"id": user.Id}).
+		RunWith(p.Db).Exec()
+	if err != nil {
+		fmt.Println("can't turn query into sql", err)
+		return models.NewServiceError(models.ServiceErrorInternalError, "could not update password", http.StatusInternalServerError, &err)
+	}
+
+	return nil
 }

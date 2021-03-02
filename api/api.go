@@ -25,6 +25,7 @@ func Init(e *echo.Echo, repo resource.Postgres, cfg config.Config) {
 
 	r := e.Group("")
 	r.Use(middleware.JWT([]byte(cfg.JwtAccessSecret)))
+	r.POST("/reset-password", h.resetPassword)
 	r.POST("/thing", someHandler)
 
 }

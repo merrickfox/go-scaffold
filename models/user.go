@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"github.com/merrickfox/go-scaffold/crypto"
@@ -18,15 +17,17 @@ type UserRequest struct {
 }
 
 type UserDb struct {
-	Id                  string     `db:"id"`
-	Username            string     `db:"username"`
-	Email               string     `db:"email"`
-	GivenName           string     `db:"given_name"`
-	FamilyName          string     `db:"family_name"`
-	HashedPassword      string     `db:"hashed_password"`
-	PasswordLastUpdated *time.Time `db:"password_last_updated"`
-	CreatedAt           *time.Time `db:"created_at"`
-	UpdatedAt           *time.Time `db:"updated_at"`
+	Id                    string     `db:"id"`
+	Username              string     `db:"username"`
+	Email                 string     `db:"email"`
+	GivenName             string     `db:"given_name"`
+	FamilyName            string     `db:"family_name"`
+	HashedPassword        string     `db:"hashed_password"`
+	PasswordLastUpdated   *time.Time `db:"password_last_updated"`
+	EmailIsConfirmed      bool       `db:"email_is_confirmed"`
+	EmailConfirmationCode string     `db:"email_confirmation_code"`
+	CreatedAt             *time.Time `db:"created_at"`
+	UpdatedAt             *time.Time `db:"updated_at"`
 }
 
 type LoginRequest struct {
@@ -40,12 +41,33 @@ type LoginResponse struct {
 }
 
 type RefreshRequest struct {
-	RefreshToken    string `json:"refreshToken"`
+	RefreshToken string `json:"refreshToken"`
+}
+
+type ResetPasswordRequest struct {
+	OldPassword string `json:"oldPassword"`
+	NewPassword string `json:"newPassword"`
+}
+
+func (rp ResetPasswordRequest) Validate() *ServiceError {
+	err := validation.ValidateStruct(&rp,
+		validation.Field(&rp.NewPassword, validation.Required, validation.Length(5, 80)),
+		validation.Field(&rp.OldPassword, validation.Required),
+	)
+
+	if err != nil {
+		se := NewServiceError(ServiceErrorInvalidRequestBody, err.Error(), http.StatusBadRequest, &err)
+		return se
+	}
+
+	if rp.NewPassword == rp.OldPassword {
+		se := NewServiceError(ServiceErrorInvalidRequestBody, "new password cannot be the same as your old password", http.StatusBadRequest, nil)
+		return se
+	}
+	return nil
 }
 
 func (ur UserRequest) Validate() *ServiceError {
-	fmt.Println("user: ")
-	fmt.Println(ur)
 	err := validation.ValidateStruct(&ur,
 		validation.Field(&ur.Email, validation.Required, is.Email, validation.Length(1, 50)),
 		validation.Field(&ur.Username, validation.Required, validation.Length(3, 20)),

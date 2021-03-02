@@ -26,6 +26,5 @@ func (h *handler) register(c echo.Context) error {
 	if err != nil {
 		return err.ToResponse(c)
 	}
-
 	return c.String(http.StatusCreated, "")
 }
