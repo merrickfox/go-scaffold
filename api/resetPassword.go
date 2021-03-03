@@ -6,6 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/merrickfox/go-scaffold/crypto"
 	"github.com/merrickfox/go-scaffold/models"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 	"time"
 )
@@ -35,12 +36,21 @@ func (h *handler) resetPassword(c echo.Context) error {
 	}
 
 	email := cl["email"].(string)
+	log.WithFields(log.Fields{
+		"email": email,
+		"ip": c.RealIP(),
+	}).Info("password reset request")
+
 	user, se := h.resource.FetchUserByEmail(email)
 	if se != nil {
 		return se.ToResponse(c)
 	}
 	fmt.Println(user)
 	if ok := crypto.CheckPasswordHash(rp.OldPassword, user.HashedPassword); !ok {
+		log.WithFields(log.Fields{
+			"email": email,
+			"ip": c.RealIP(),
+		}).Info("failed password reset request")
 		err = models.NewServiceError(models.ServiceErrorUnauthorised, "Incorrect user or password", http.StatusUnauthorized, nil)
 		return err.ToResponse(c)
 	}

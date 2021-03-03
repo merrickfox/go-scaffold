@@ -7,7 +7,7 @@ import (
 	"github.com/merrickfox/go-scaffold/api"
 	"github.com/merrickfox/go-scaffold/config"
 	"github.com/merrickfox/go-scaffold/resource"
-	"log"
+	log "github.com/sirupsen/logrus"
 )
 
 func main() {

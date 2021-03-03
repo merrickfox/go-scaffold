@@ -5,6 +5,7 @@ import (
 	"github.com/merrickfox/go-scaffold/crypto"
 	"github.com/merrickfox/go-scaffold/jwt"
 	"github.com/merrickfox/go-scaffold/models"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 )
 
@@ -13,13 +14,21 @@ func (h *handler) login(c echo.Context) error {
 	if err := c.Bind(lr); err != nil {
 		return err
 	}
-
+	log.WithFields(log.Fields{
+		"email": lr.Email,
+		"ip": c.RealIP(),
+	}).Info("login request received")
 	user, err := h.resource.FetchUserByEmail(lr.Email)
 	if err != nil {
 		return err.ToResponse(c)
 	}
 
 	if ok := crypto.CheckPasswordHash(lr.Password, user.HashedPassword); !ok {
+		log.WithFields(log.Fields{
+			"email": lr.Email,
+			"incorrect_password": lr.Password,
+			"ip": c.RealIP(),
+		}).Info("failed login request")
 		err = models.NewServiceError(models.ServiceErrorUnauthorised, "Incorrect user or password", http.StatusUnauthorized, nil)
 		return err.ToResponse(c)
 	}
@@ -29,6 +38,10 @@ func (h *handler) login(c echo.Context) error {
 		return err.ToResponse(c)
 	}
 
+	log.WithFields(log.Fields{
+		"email": lr.Email,
+		"ip": c.RealIP(),
+	}).Info("successful login")
 	return c.JSON(http.StatusOK, resp)
 }
 
