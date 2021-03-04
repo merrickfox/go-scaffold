@@ -26,7 +26,6 @@ func (h *handler) login(c echo.Context) error {
 	if ok := crypto.CheckPasswordHash(lr.Password, user.HashedPassword); !ok {
 		log.WithFields(log.Fields{
 			"email": lr.Email,
-			"incorrect_password": lr.Password,
 			"ip": c.RealIP(),
 		}).Info("failed login request")
 		err = models.NewServiceError(models.ServiceErrorUnauthorised, "Incorrect user or password", http.StatusUnauthorized, nil)

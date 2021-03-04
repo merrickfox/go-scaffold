@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/merrickfox/go-scaffold/api"
@@ -23,7 +24,6 @@ func main() {
 	if err := repo.Migrate(); err != nil {
 		log.Fatalf("could not migrate : %v", err)
 	}
-
 
 	e := echo.New()
 

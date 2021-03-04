@@ -19,8 +19,9 @@ func Init(e *echo.Echo, repo resource.Postgres, cfg config.Config) {
 		config: cfg,
 	}
 
+
 	e.POST("/register", h.register)
-	e.POST("/login", h.login)
+	e.POST("/login", h.login, middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(1)))
 	e.POST("/refresh", h.refresh)
 
 	r := e.Group("")
