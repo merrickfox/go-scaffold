@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS users
     email TEXT NOT NULL UNIQUE,
     given_name TEXT NOT NULL,
     family_name TEXT NOT NULL,
+    profile_image_url TEXT,
     hashed_password TEXT NOT NULL,
     password_last_updated TIMESTAMP NOT NULL DEFAULT NOW(),
     email_is_confirmed BOOLEAN DEFAULT FALSE,
