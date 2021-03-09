@@ -19,15 +19,21 @@ func Init(e *echo.Echo, repo resource.Postgres, cfg config.Config) {
 		config: cfg,
 	}
 
-
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"http://localhost:3000"},
+		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAccessControlAllowCredentials},
+		AllowCredentials: true,
+	}))
 	e.POST("/register", h.register)
 	e.POST("/login", h.login, middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(1)))
 	e.POST("/refresh", h.refresh)
+
 
 	r := e.Group("")
 	r.Use(middleware.JWT([]byte(cfg.JwtAccessSecret)))
 	r.POST("/reset-password", h.resetPassword)
 	r.POST("/thing", someHandler)
+	r.GET("/user", h.user)
 
 }
 

@@ -2,9 +2,9 @@ package api
 
 import (
 	"fmt"
-	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo/v4"
 	"github.com/merrickfox/go-scaffold/crypto"
+	"github.com/merrickfox/go-scaffold/jwt"
 	"github.com/merrickfox/go-scaffold/models"
 	log "github.com/sirupsen/logrus"
 	"net/http"
@@ -22,17 +22,13 @@ func (h *handler) resetPassword(c echo.Context) error {
 		return err.ToResponse(c)
 	}
 
+
+	fmt.Println(c.Get("user"))
 	t := c.Get("user")
 
-	token, ok := t.(*jwt.Token)
-	if !ok {
-		se := models.NewServiceError(models.ServiceErrorInternalError, "error converting jwt into usable struct", http.StatusInternalServerError, nil)
-		return se.ToResponse(c)
-	}
-	cl, ok := token.Claims.(jwt.MapClaims)
-	if !ok {
-		se := models.NewServiceError(models.ServiceErrorInternalError, "error converting jwt into usable struct", http.StatusInternalServerError, nil)
-		return se.ToResponse(c)
+	cl, err := jwt.GetRawClaimsFromToken(t)
+	if err != nil {
+		return err.ToResponse(c)
 	}
 
 	email := cl["email"].(string)
@@ -45,7 +41,7 @@ func (h *handler) resetPassword(c echo.Context) error {
 	if se != nil {
 		return se.ToResponse(c)
 	}
-	fmt.Println(user)
+
 	if ok := crypto.CheckPasswordHash(rp.OldPassword, user.HashedPassword); !ok {
 		log.WithFields(log.Fields{
 			"email": email,

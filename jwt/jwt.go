@@ -133,3 +133,39 @@ func VerifyJwt(signingKey []byte, t string, claims jwt.Claims) (*jwt.Token, *mod
 
 	return pt, nil
 }
+
+func GetRawClaimsFromToken(t interface{}) (jwt.MapClaims, *models.ServiceError) {
+	token, ok := t.(*jwt.Token)
+	if !ok {
+		se := models.NewServiceError(models.ServiceErrorInternalError, "error converting jwt into usable struct", http.StatusInternalServerError, nil)
+		return nil, se
+	}
+	cl, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		se := models.NewServiceError(models.ServiceErrorInternalError, "error converting jwt into usable struct", http.StatusInternalServerError, nil)
+		return nil, se
+	}
+
+	return cl, nil
+}
+
+func GetUserFromToken(t interface{}) (*models.UserResponse, *models.ServiceError) {
+	cl, se := GetRawClaimsFromToken(t)
+	if se != nil {
+		return nil, se
+	}
+
+	rd := cl["user_reg_date"].(float64)
+	tm := time.Unix(int64(rd), 0)
+	
+	u := models.UserResponse{
+		Id:                  cl["sub"].(string),
+		Username:            cl["username"].(string),
+		Email:               cl["email"].(string),
+		GivenName:           cl["given_name"].(string),
+		FamilyName:          cl["family_name"].(string),
+		CreatedAt:           &tm,
+	}
+
+	return &u, nil
+}

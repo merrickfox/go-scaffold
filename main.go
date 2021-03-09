@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 	"github.com/merrickfox/go-scaffold/api"
 	"github.com/merrickfox/go-scaffold/config"
 	"github.com/merrickfox/go-scaffold/resource"
@@ -26,14 +25,8 @@ func main() {
 	}
 
 	e := echo.New()
-
-
 	//e.Use(middleware.Recover())
-	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-	}))
-
 	api.Init(e, repo, cfg)
-
 
 	// Start server
 	e.Logger.Fatal(e.Start(":6969"))

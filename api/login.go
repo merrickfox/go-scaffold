@@ -7,6 +7,7 @@ import (
 	"github.com/merrickfox/go-scaffold/models"
 	log "github.com/sirupsen/logrus"
 	"net/http"
+	"time"
 )
 
 func (h *handler) login(c echo.Context) error {
@@ -36,6 +37,22 @@ func (h *handler) login(c echo.Context) error {
 	if err != nil {
 		return err.ToResponse(c)
 	}
+
+	at := new(http.Cookie)
+	at.Name = "accessToken"
+	at.Value = resp.AccessToken
+	at.Expires = time.Now().Add(24 * time.Hour)
+	at.SameSite = 3
+	//at.Secure = true
+	c.SetCookie(at)
+
+	rt := new(http.Cookie)
+	rt.Name = "refreshToken"
+	rt.Value = resp.RefreshToken
+	rt.Expires = time.Now().Add(24 * time.Hour)
+	rt.SameSite = 3
+	//rt.Secure = true
+	c.SetCookie(rt)
 
 	log.WithFields(log.Fields{
 		"email": lr.Email,

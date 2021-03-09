@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-type UserRequest struct {
+type RegisterRequest struct {
 	Username   string `json:"username"`
 	Email      string `json:"email"`
 	GivenName  string `json:"givenName"`
@@ -28,6 +28,15 @@ type UserDb struct {
 	EmailConfirmationCode string     `db:"email_confirmation_code"`
 	CreatedAt             *time.Time `db:"created_at"`
 	UpdatedAt             *time.Time `db:"updated_at"`
+}
+
+type UserResponse struct {
+	Id                    string     `json:"id"`
+	Username              string     `json:"username"`
+	Email                 string     `json:"email"`
+	GivenName             string     `json:"given_name"`
+	FamilyName            string     `json:"family_name"`
+	CreatedAt             *time.Time `json:"created_at"`
 }
 
 type LoginRequest struct {
@@ -67,7 +76,7 @@ func (rp ResetPasswordRequest) Validate() *ServiceError {
 	return nil
 }
 
-func (ur UserRequest) Validate() *ServiceError {
+func (ur RegisterRequest) Validate() *ServiceError {
 	err := validation.ValidateStruct(&ur,
 		validation.Field(&ur.Email, validation.Required, is.Email, validation.Length(1, 50)),
 		validation.Field(&ur.Username, validation.Required, validation.Length(3, 20)),
@@ -83,7 +92,7 @@ func (ur UserRequest) Validate() *ServiceError {
 	return nil
 }
 
-func (ur UserRequest) ToDbStruct() (*UserDb, *ServiceError) {
+func (ur RegisterRequest) ToDbStruct() (*UserDb, *ServiceError) {
 	udb := UserDb{
 		Username:   ur.Username,
 		Email:      ur.Email,

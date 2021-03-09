@@ -8,7 +8,7 @@ import (
 )
 
 func (h *handler) register(c echo.Context) error {
-	user := new(models.UserRequest)
+	user := new(models.RegisterRequest)
 	if err := c.Bind(user); err != nil {
 		return err
 	}
