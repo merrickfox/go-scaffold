@@ -6,8 +6,10 @@ import (
 )
 
 type Config struct {
-	JwtAccessSecret string `env:"JWT_ACCESS_SECRET"`
-	JwtRefreshSecret string `env:"JWT_REFRESH_SECRET"`
+	JwtAccessSecret     string `env:"JWT_ACCESS_SECRET"`
+	JwtRefreshSecret    string `env:"JWT_REFRESH_SECRET"`
+	AccessExpiryMinutes int    `env:"ACCESS_EXPIRY_MINUTES"`
+	RefreshExpiryHours  int    `env:"REFRESH_EXPIRY_HOURS"`
 }
 
 func GetConfig() Config {

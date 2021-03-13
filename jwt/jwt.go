@@ -157,7 +157,7 @@ func GetUserFromToken(t interface{}) (*models.UserResponse, *models.ServiceError
 
 	rd := cl["user_reg_date"].(float64)
 	tm := time.Unix(int64(rd), 0)
-	
+
 	u := models.UserResponse{
 		Id:                  cl["sub"].(string),
 		Username:            cl["username"].(string),

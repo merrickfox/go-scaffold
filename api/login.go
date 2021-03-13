@@ -41,7 +41,7 @@ func (h *handler) login(c echo.Context) error {
 	at := new(http.Cookie)
 	at.Name = "accessToken"
 	at.Value = resp.AccessToken
-	at.Expires = time.Now().Add(24 * time.Hour)
+	at.Expires = time.Now().Add(time.Duration(h.config.AccessExpiryMinutes) * time.Minute)
 	at.SameSite = 3
 	//at.Secure = true
 	c.SetCookie(at)
@@ -49,7 +49,7 @@ func (h *handler) login(c echo.Context) error {
 	rt := new(http.Cookie)
 	rt.Name = "refreshToken"
 	rt.Value = resp.RefreshToken
-	rt.Expires = time.Now().Add(24 * time.Hour)
+	rt.Expires = time.Now().Add(time.Duration(h.config.RefreshExpiryHours) * time.Hour)
 	rt.SameSite = 3
 	//rt.Secure = true
 	c.SetCookie(rt)
@@ -75,8 +75,8 @@ func (h *handler) refresh(c echo.Context) error {
 
 	ptClaims, ok := pt.Claims.(*jwt.RefreshClaims)
 	if !ok {
-		err = models.NewServiceError(models.ServiceErrorInternalError, "internal error", http.StatusInternalServerError, nil)
-		return err.ToResponse(c)
+		se := models.NewServiceError(models.ServiceErrorInternalError, "internal error", http.StatusInternalServerError, nil)
+		return se.ToResponse(c)
 	}
 
 	user, err := h.resource.FetchUserById(ptClaims.Subject)
@@ -85,6 +85,22 @@ func (h *handler) refresh(c echo.Context) error {
 	}
 
 	resp, err := jwt.GenerateJwtPair(*user, h.config.JwtAccessSecret, h.config.JwtRefreshSecret)
+
+	at := new(http.Cookie)
+	at.Name = "accessToken"
+	at.Value = resp.AccessToken
+	at.Expires = time.Now().Add(time.Duration(h.config.AccessExpiryMinutes) * time.Minute)
+	at.SameSite = 3
+	//at.Secure = true
+	c.SetCookie(at)
+
+	rt := new(http.Cookie)
+	rt.Name = "refreshToken"
+	rt.Value = resp.RefreshToken
+	rt.Expires = time.Now().Add(time.Duration(h.config.RefreshExpiryHours) * time.Hour)
+	rt.SameSite = 3
+	//rt.Secure = true
+	c.SetCookie(rt)
 
 	return c.JSON(http.StatusOK, resp)
 }
