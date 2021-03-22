@@ -48,7 +48,6 @@ func ErrorHandler(next echo.HandlerFunc) echo.HandlerFunc {
 		if err := next(c); err != nil {
 			ee, ok := err.(*echo.HTTPError)
 			if ok && ee.Code == 400 && ee.Message == "missing or malformed jwt" {
-				println("here")
 				se := models.NewServiceError(models.ServiceErrorUnauthorised, "unauthorised", http.StatusUnauthorized, nil)
 				se.ToResponse(c)
 			} else {
