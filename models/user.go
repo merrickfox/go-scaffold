@@ -26,17 +26,18 @@ type UserDb struct {
 	PasswordLastUpdated   *time.Time `db:"password_last_updated"`
 	EmailIsConfirmed      bool       `db:"email_is_confirmed"`
 	EmailConfirmationCode string     `db:"email_confirmation_code"`
+	ProfileImageUrl       *string    `db:"profile_image_url"`
 	CreatedAt             *time.Time `db:"created_at"`
 	UpdatedAt             *time.Time `db:"updated_at"`
 }
 
 type UserResponse struct {
-	Id                    string     `json:"id"`
-	Username              string     `json:"username"`
-	Email                 string     `json:"email"`
-	GivenName             string     `json:"given_name"`
-	FamilyName            string     `json:"family_name"`
-	CreatedAt             *time.Time `json:"created_at"`
+	Id         string     `json:"id"`
+	Username   string     `json:"username"`
+	Email      string     `json:"email"`
+	GivenName  string     `json:"given_name"`
+	FamilyName string     `json:"family_name"`
+	CreatedAt  *time.Time `json:"created_at"`
 }
 
 type LoginRequest struct {

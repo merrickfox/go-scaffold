@@ -14,7 +14,7 @@ func main() {
 	fmt.Println("API started...")
 
 	cfg := config.GetConfig()
-	repo, closeRepo, err := resource.NewPostgresRepo()
+	repo, closeRepo, err := resource.NewPostgresRepo(cfg)
 	if err != nil {
 		log.Fatal("could not start db")
 	}

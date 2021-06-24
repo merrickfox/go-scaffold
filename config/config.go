@@ -10,6 +10,11 @@ type Config struct {
 	JwtRefreshSecret    string `env:"JWT_REFRESH_SECRET"`
 	AccessExpiryMinutes int    `env:"ACCESS_EXPIRY_MINUTES"`
 	RefreshExpiryHours  int    `env:"REFRESH_EXPIRY_HOURS"`
+	DbName string `env:"DB_DBNAME"`
+	DbHost string `env:"DB_HOST"`
+	DbUser string `env:"DB_USER"`
+	DbPassword string `env:"DB_PASSWORD"`
+	DbPort string `env:"DB_PORT"`
 }
 
 func GetConfig() Config {
